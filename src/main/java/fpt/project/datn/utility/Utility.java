@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.*;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class Utility {
     @Getter
@@ -51,7 +53,7 @@ public class Utility {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
-    public static String htmlTemplateReader(String path) {
+    public static String htmlTemplateReader(String path, Map<String, String> attributes) {
         StringBuilder html = new StringBuilder();
         try{
             File template = getFile(path);
@@ -67,10 +69,40 @@ public class Utility {
         catch (Exception ignored) {
 
         }
-        return html.toString();
+        return insertHtmlAttribute(html.toString(), attributes);
+    }
+
+    private static String insertHtmlAttribute(String html, Map<String, String> attributes) {
+        Set<String> keys = attributes.keySet();
+        StringBuilder attribute = new StringBuilder();
+        for(String key : keys) {
+            html = html.replace(attribute.append("{{")
+                            .append(key)
+                            .append("}}")
+                    , attributes.get(key)
+            );
+            attribute.setLength(0);
+        }
+        return html;
     }
 
     public static File getFile(String path) throws IOException {
         return resourceLoader.getResource("classpath:" + path).getFile();
+    }
+
+    public static String getRanCode(long maxNum) {
+        Random random = new Random();
+        long codeNum = random.nextLong(maxNum);
+        StringBuilder code = new StringBuilder(String.valueOf(codeNum));
+        int minLength = String.valueOf(maxNum).length();
+        while (true) {
+            int length = code.length();
+            if(minLength > length) {
+                code.insert(0, "0");
+                continue;
+            }
+            break;
+        }
+        return code.toString();
     }
 }

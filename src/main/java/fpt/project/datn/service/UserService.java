@@ -3,6 +3,7 @@ package fpt.project.datn.service;
 import fpt.project.datn.event.event.AccountVerificationEvent;
 import fpt.project.datn.object.dto.req.UserReq;
 import fpt.project.datn.object.entity.User;
+import fpt.project.datn.repository.UserCodeRepository;
 import fpt.project.datn.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
@@ -14,17 +15,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService extends AbsGeneralCRUDService<User, UserReq, User, Integer>{
     private final BCryptPasswordEncoder encoder;
+    private final UserCodeRepository userCodeRepository;
 
-    public UserService(UserRepository repository, ModelMapper modelMapper, BCryptPasswordEncoder encoder, ApplicationEventPublisher publisher) {
+    public UserService(UserRepository repository, UserCodeRepository userCodeRepository, ModelMapper modelMapper, BCryptPasswordEncoder encoder, ApplicationEventPublisher publisher) {
         super(repository, modelMapper, User.class, User.class, publisher);
         this.encoder = encoder;
+        this.userCodeRepository = userCodeRepository;
     }
 
     @Override
     public void save(UserReq user) {
         user.setPassword(encoder.encode(user.getPassword()));
         super.save(user);
-        new AccountVerificationEvent().addParam("user", user).trigger(publisher);
+        new AccountVerificationEvent()
+                .addParam("user", user)
+                .addParam("userRepository", super.repository)
+                .addParam("userCodeRepository", this.userCodeRepository)
+                .trigger(publisher);
     }
 
     @Override

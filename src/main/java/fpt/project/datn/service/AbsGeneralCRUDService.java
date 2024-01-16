@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 public abstract class AbsGeneralCRUDService<RES, REQ, E, ID> {
 
-    private final JpaRepository<E, ID> repository;
+    protected final JpaRepository<E, ID> repository;
     private final ModelMapper modelMapper;
     private Class<RES> RESClass;
     private Class<E> EClass;

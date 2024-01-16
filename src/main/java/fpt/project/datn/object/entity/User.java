@@ -37,6 +37,8 @@ public class User extends GeneralEntity implements UserDetails {
     private List<Token> tokens;
     @OneToMany(mappedBy = "user")
     private List<Profiles> profiles;
+    @OneToMany(mappedBy = "user")
+    private List<UserCode> userCodes;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

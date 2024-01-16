@@ -8,10 +8,7 @@ import fpt.project.datn.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -28,8 +25,8 @@ public class UserController extends AbsGeneralCRUDController<User, UserReq, User
         service.login(userInfo, req, res);
     }
 
-    @PostMapping("/acount-confirmation")
-    public ResponseEntity<?> confirmation() {
-        return null;
+    @PostMapping("/account-confirmation/{code}")
+    public String confirmation(@PathVariable String code) {
+        return service.emailConfirmation(code);
     }
 }

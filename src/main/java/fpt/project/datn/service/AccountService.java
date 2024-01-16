@@ -1,10 +1,12 @@
 package fpt.project.datn.service;
 
 import fpt.project.datn.exception.custom.AccountAuthenticationException;
+import fpt.project.datn.exception.custom.EmailConfirmationException;
 import fpt.project.datn.object.dto.req.LoginReq;
 import fpt.project.datn.object.entity.Token;
 import fpt.project.datn.object.entity.User;
 import fpt.project.datn.repository.TokenRepository;
+import fpt.project.datn.repository.UserCodeRepository;
 import fpt.project.datn.repository.UserRepository;
 import fpt.project.datn.security.service.SecurityService;
 import fpt.project.datn.utility.Utility;
@@ -24,6 +26,7 @@ public class AccountService {
     private final SecurityService securityService;
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
+    private final UserCodeRepository userCodeRepository;
 
     public void login(LoginReq userInfo, HttpServletRequest req, HttpServletResponse res) {
         authenticationManager.authenticate(
@@ -34,12 +37,8 @@ public class AccountService {
         );
         //null checking is not necessary
         User user = userRepository.findUserByUsername(userInfo.getUsername()).get();
-        accountVerificationChecking(user);
         sendTokenCookies(user ,req, res);
-    }
-
-    public boolean accountConfirmation(String code) {
-        return false;
+        accountVerificationChecking(user);
     }
 
     private void sendTokenCookies(User user, HttpServletRequest req, HttpServletResponse res) {
@@ -65,7 +64,7 @@ public class AccountService {
         refreshCookie.setMaxAge(60*60*10);
         res.addCookie(accessCookie);
         res.addCookie(refreshCookie);
-        saveToken(Utility.getCurrentUserName(), accessCookie.getValue(), refreshCookie.getValue());
+        saveToken(user.getUsername(), accessCookie.getValue(), refreshCookie.getValue());
     }
 
     @Async
@@ -79,6 +78,15 @@ public class AccountService {
         if(!user.isEmailConfirmed()) {
             throw new AccountAuthenticationException("email is not confirmed");
         }
+    }
+
+    public String emailConfirmation(String code) {
+        String username = Utility.getCurrentUserName();
+        if(userCodeRepository.emailConfirmation(username, code) == 0) {
+            throw new EmailConfirmationException();
+        }
+        userRepository.confirmEmail(username);
+        return "email confirmed";
     }
 
 }
