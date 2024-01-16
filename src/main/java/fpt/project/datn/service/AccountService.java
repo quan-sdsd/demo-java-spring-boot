@@ -58,13 +58,8 @@ public class AccountService {
         accessCookie.setDomain(domain);
         accessCookie.setPath("/");
         accessCookie.setMaxAge(60*60);
-        Cookie refreshCookie = new Cookie("refresh-cookie", securityService.generateRefreshToken(user));
-        refreshCookie.setDomain(domain);
-        refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(60*60*10);
         res.addCookie(accessCookie);
-        res.addCookie(refreshCookie);
-        saveToken(user.getUsername(), accessCookie.getValue(), refreshCookie.getValue());
+        saveToken(user.getUsername(), accessCookie.getValue(), securityService.generateRefreshToken(user));
     }
 
     @Async
