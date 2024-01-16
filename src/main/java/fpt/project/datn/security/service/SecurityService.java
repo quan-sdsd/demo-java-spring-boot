@@ -22,9 +22,11 @@ public class SecurityService {
 
     public boolean hasToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if(cookie.getName().equals("access-cookie")) {
-                return true;
+        if(cookies != null) {
+            for (Cookie cookie : cookies) {
+                if(cookie.getName().equals("access-cookie")) {
+                    return true;
+                }
             }
         }
         return false;

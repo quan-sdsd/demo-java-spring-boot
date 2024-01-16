@@ -31,7 +31,7 @@ public abstract class GeneralEntity {
     @Column(insertable = false)
     private Date updateAt;
     @Column(insertable = false)
-    private Boolean isDeleted;
+    private boolean isDeleted;
     @Column(insertable = false)
     private String deleteBy;
     @Column(insertable = false)
